@@ -1,0 +1,15 @@
+{
+  "id": "@my-org/hello-world",
+  "displayName": "Hello World",
+  "version": "1.0.0",
+  "description": "A starter template for building Signals & Sorcery plugins",
+  "generatorType": "midi",
+  "main": "dist/index.js",
+  "author": "Your Name",
+  "minHostVersion": "1.0.0",
+  "builtIn": false,
+  "capabilities": {
+    "requiresLLM": true,
+    "requiresSurgeXT": true
+  }
+}
