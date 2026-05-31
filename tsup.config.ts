@@ -2,11 +2,11 @@ import { defineConfig } from 'tsup';
 
 export default defineConfig({
   entry: ['index.ts'],
-  format: ['cjs'],
-  dts: false,
-  sourcemap: false,
+  format: ['cjs', 'esm'], // host loads the CommonJS build via plugin.json "main"
+  dts: true,
+  sourcemap: true,
   clean: true,
-  // React and the SDK are provided by the host at runtime — don't bundle them
+  // Provided by the host at runtime — never bundle these into your plugin.
   external: ['react', 'react-dom', '@signalsandsorcery/plugin-sdk'],
-  jsx: 'automatic',
+  treeshake: true,
 });

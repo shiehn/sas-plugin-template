@@ -6,7 +6,8 @@
   "generatorType": "midi",
   "main": "dist/index.js",
   "author": "Your Name",
-  "minHostVersion": "1.0.0",
+  "icon": "icon.svg",
+  "minHostVersion": "2.0.0",
   "builtIn": false,
   "capabilities": {
     "requiresLLM": true,

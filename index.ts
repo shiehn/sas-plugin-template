@@ -1,24 +1,27 @@
 /**
- * Plugin Entry Point
+ * Plugin entry point — @my-org/hello-world
  *
- * This is the main file of your plugin. It exports a class that implements
- * the GeneratorPlugin interface from the SDK. The host discovers this file
- * via the "main" field in plugin.json.
+ * A minimal, working starter for Signals & Sorcery plugins. Rename the ids
+ * and metadata below, build your UI in HelloWorldPanel.tsx, run `npm run
+ * build`, and drop the folder into the app's plugins directory (see README).
  *
  * Lifecycle:
- *   1. Host discovers plugin.json in the plugins directory
- *   2. Host loads this file and finds the default export
- *   3. Host calls activate(host) — you receive the PluginHost API
- *   4. Host calls getUIComponent() — you return your React panel
- *   5. On shutdown/disable, host calls deactivate()
+ *   1. The host reads plugin.json and loads the file named by "main".
+ *   2. It imports the default export (this class) and constructs it.
+ *   3. activate(host) runs once — `host` is your entire API surface.
+ *   4. getUIComponent() returns the React panel shown in the accordion.
+ *   5. deactivate() runs on disable/shutdown (finish within ~5s).
  *
- * Docs: https://signalsandsorcery.com/plugin-sdk/getting-started.html
- * API:  https://signalsandsorcery.com/plugin-sdk/api-reference.html
+ * The metadata fields here mirror plugin.json — keep id, displayName,
+ * version, and generatorType in sync across both files.
+ *
+ * Docs: https://signalsandsorcery.com/plugin-sdk/
  */
 
 import type { ComponentType } from 'react';
 import type {
   GeneratorPlugin,
+  GeneratorType,
   PluginHost,
   PluginUIProps,
   PluginSettingsSchema,
@@ -26,85 +29,53 @@ import type {
 } from '@signalsandsorcery/plugin-sdk';
 import { HelloWorldPanel } from './HelloWorldPanel';
 
-/**
- * HelloWorldPlugin — A minimal plugin template.
- *
- * Change the id, displayName, and description to match your plugin.
- * The id MUST match the "id" field in plugin.json.
- *
- * generatorType determines what kind of content your plugin creates:
- *   - 'midi'   → Creates MIDI patterns (synths, drums, melodies)
- *   - 'audio'  → Creates audio files (textures, samples)
- *   - 'sample' → Manages audio samples from a library
- *   - 'hybrid' → Combines multiple types
- */
 export class HelloWorldPlugin implements GeneratorPlugin {
   readonly id = '@my-org/hello-world';
   readonly displayName = 'Hello World';
   readonly version = '1.0.0';
-  readonly description = 'A starter template for building S&S plugins';
-  readonly generatorType = 'midi' as const;
+  readonly description = 'A starter template for building Signals & Sorcery plugins';
 
-  // Store the host reference so your UI component can access it
+  /** What this plugin produces: 'midi' | 'audio' | 'sample' | 'hybrid'. */
+  readonly generatorType: GeneratorType = 'midi';
+
   private host: PluginHost | null = null;
 
-  /**
-   * Called once when the plugin is loaded.
-   * Use this to initialize state, register event listeners, etc.
-   * The host object is your entire API surface — tracks, MIDI, audio, LLM, and more.
-   */
+  /** Runs once when the plugin loads. `host` is the whole API surface. */
   async activate(host: PluginHost): Promise<void> {
     this.host = host;
-    console.log('[HelloWorld] Plugin activated!');
-
-    // Example: Log the current musical context
-    // const ctx = await host.getMusicalContext();
-    // console.log(`[HelloWorld] Key: ${ctx.key} ${ctx.mode}, BPM: ${ctx.bpm}`);
+    console.log('[HelloWorld] activated');
   }
 
-  /**
-   * Called when the plugin is disabled or the app shuts down.
-   * Clean up event listeners, timers, etc. Must complete within 5 seconds.
-   */
+  /** Runs on disable/shutdown. Clean up listeners and timers here. */
   async deactivate(): Promise<void> {
     this.host = null;
-    console.log('[HelloWorld] Plugin deactivated');
+    console.log('[HelloWorld] deactivated');
   }
 
-  /**
-   * Return the React component that renders in the accordion panel.
-   * The component receives PluginUIProps: { host, activeSceneId, isAuthenticated, isConnected, ... }
-   */
+  /** The React component rendered inside the accordion panel. */
   getUIComponent(): ComponentType<PluginUIProps> {
     return HelloWorldPanel;
   }
 
-  /**
-   * Return a JSON Schema for plugin settings, or null for no settings.
-   * If provided, the host auto-renders a settings form in the plugin manager.
-   */
+  /** A JSON Schema for a settings form, or null for no settings. */
   getSettingsSchema(): PluginSettingsSchema | null {
     return null;
   }
 
-  /**
-   * Optional: Called when the user switches to a different scene.
-   * Use this to reload scene-specific state or clear caches.
-   */
+  // ── Optional lifecycle hooks (delete if unused) ───────────────────
+
+  /** Called when the user switches scenes. */
   async onSceneChanged(_sceneId: string | null): Promise<void> {
-    // Example: reload your plugin's tracks for the new scene
-    // const tracks = await this.host?.getPluginTracks();
+    // e.g. re-sync this scene's tracks: await this.host?.adoptSceneTracks();
   }
 
-  /**
-   * Optional: Called when the musical context changes
-   * (chords updated, tracks added/removed, BPM changed).
-   */
+  /** Called when the musical context changes (chords, BPM, tracks…). */
   onContextChanged(_context: MusicalContext): void {
-    // Example: re-generate content when chords change
-    // console.log(`[HelloWorld] Context changed: ${context.key} ${context.mode}`);
+    // e.g. regenerate when the chord progression changes.
   }
+
+  // Advanced: implement getSkills() to expose LLM-callable actions to the
+  // in-app assistant. See the chat plugin for a complete example.
 }
 
-// Default export — the host looks for this
 export default HelloWorldPlugin;
