@@ -30,8 +30,6 @@ import type {
 import {
   TrackRow,
   useSceneState,
-  EMPTY_FX_DETAIL_STATE,
-  type TrackFxDetailState,
 } from '@signalsandsorcery/plugin-sdk';
 
 // ---------------------------------------------------------------------------
@@ -44,12 +42,11 @@ type TrackMixerState = { muted: boolean; solo: boolean; volume: number; pan: num
 interface TrackEntry {
   handle: PluginTrackHandle;
   runtimeState: TrackMixerState; // muted / solo / volume / pan
-  fxDetailState: TrackFxDetailState; // per-category FX state for the FX drawer
   prompt: string;
   hasMidi: boolean;
   isGenerating: boolean;
   error: string | null;
-  fxDrawerOpen: boolean;
+  drawerOpen: boolean; // the row drawer (instrument picker, FX, history…)
   generationProgress: number;
 }
 
@@ -113,14 +110,11 @@ export function HelloWorldPanel({
           return {
             handle,
             runtimeState,
-            // host.getTrackFxState(id) returns the live FX state if you want
-            // the FX drawer to reflect it; the empty state is fine to start.
-            fxDetailState: EMPTY_FX_DETAIL_STATE,
             prompt: promptsRef.current[handle.id] ?? handle.prompt ?? '',
             hasMidi,
             isGenerating: false,
             error: null,
-            fxDrawerOpen: false,
+            drawerOpen: false,
             generationProgress: 0,
           };
         }),
@@ -247,12 +241,11 @@ export function HelloWorldPanel({
         {
           handle,
           runtimeState: DEFAULT_RUNTIME,
-          fxDetailState: EMPTY_FX_DETAIL_STATE,
           prompt: '',
           hasMidi: false,
           isGenerating: false,
           error: null,
-          fxDrawerOpen: false,
+          drawerOpen: false,
           generationProgress: 0,
         },
       ]);
@@ -317,8 +310,8 @@ export function HelloWorldPanel({
           track={track.handle}
           prompt={track.prompt}
           runtimeState={track.runtimeState}
-          fxDetailState={track.fxDetailState}
-          fxDrawerOpen={track.fxDrawerOpen}
+          drawerOpen={track.drawerOpen}
+          drawerTab="pick"
           isGenerating={track.isGenerating}
           isAuthenticated={isAuthenticated}
           error={track.error}
@@ -359,7 +352,7 @@ export function HelloWorldPanel({
           Prefer building your own UI? Skip <TrackRow> and call the host
           primitives directly:
             host.postProcessMidi(notes, { quantize: true, swing: 15 })
-            host.toggleTrackFx(id, 'reverb', true)
+            host.loadTrackExternalFx?.(id, pluginId)   // a 3rd-party FX insert
             host.duplicateTrack(id)
           Persist data across restarts (not just scene switches):
             host.setSceneData(sceneId, key, value) / host.getSceneData(...)

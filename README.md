@@ -1,7 +1,7 @@
 # Signals & Sorcery — Plugin Template
 
 A minimal, **working** starter for building [Signals & Sorcery](https://signalsandsorcery.com) plugins.
-Tracks the current **plugin SDK 2.x**. A plugin appears as an accordion panel in the workstation and
+Tracks the current **plugin SDK 3.x**. A plugin appears as an accordion panel in the workstation and
 can create tracks, write MIDI, generate audio, call the LLM, drive the mixer/FX, and more.
 
 This template is a MIDI generator (like the built-in **Synths** plugin): it creates synth tracks and
@@ -107,8 +107,8 @@ most-used calls — see the `@signalsandsorcery/plugin-sdk` type definitions for
 | Area | Methods |
 |------|---------|
 | Tracks | `createTrack` · `getPluginTracks` · `deleteTrack` · `duplicateTrack` · `getValidRoles` |
-| Track state | `getTrackRuntimeState` · `getTrackFxDetailState` · `getTrackMidiInfo` |
-| Mixer / FX | `setTrackVolume` · `setTrackPan` · `setTrackMute` · `setTrackSolo` · `shufflePreset` · `toggleTrackFx` |
+| Track state | `getTrackInfo` · `readMidiNotes` |
+| Mixer / FX | `setTrackVolume` · `setTrackPan` · `setTrackMute` · `setTrackSolo` · `shufflePreset` · `getTrackExternalFx` / `loadTrackExternalFx` (3rd-party FX inserts) |
 | MIDI | `writeMidiClip` · `postProcessMidi` (quantize / swing / humanize / scale) |
 | AI | `generateWithLLM` · `generateWithLLMTools` (tool-calling agent loop) |
 | Context | `getMusicalContext` · `getValidRoles` |
@@ -122,7 +122,7 @@ Import host-styled UI from the SDK instead of rolling your own:
 ```ts
 import {
   TrackRow,            // full track row: prompt, generate, mixer, FX, instrument picker
-  VolumeSlider, PanSlider, FxToggleBar, InstrumentDrawer,
+  VolumeSlider, PanSlider, InstrumentDrawer,
   SorceryProgressBar,  // paced progress bar for long operations
   WaveformView, LevelMeter, ScrollingWaveform, OffsetScrubber,  // audio UI
   DownloadPackButton, SamplePackCTACard,                        // sample packs
